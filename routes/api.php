@@ -32,7 +32,6 @@ Route::post('department/depart',[DepartmentController::class,'dept_emp']);
 Route::post('department/list',[DepartmentController::class,'index']);
 
 
-
 Route::post('user/profile',[EmployeeController::class,'profile']);
 Route::post('employee/list',[EmployeeController::class,'index']);
 Route::post('employee/create',[EmployeeController::class,'create']);

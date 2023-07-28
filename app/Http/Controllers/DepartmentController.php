@@ -36,10 +36,12 @@ class DepartmentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
     public function create(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'name' => 'required|string|min:3',
+            'name' => 'required|array|min:1',
+            'name.*' => 'required|string|min:3'
         ]);
 
         if ($validate->fails()) {
@@ -47,17 +49,22 @@ class DepartmentController extends Controller
                 'Error' => $validate->messages()
             ]);
         } else {
-            $department = Department::create([
-                'name' => $request->name,
-                'token' => rand(100000, 999999)
-            ]);
 
-            if ($department) {
-                return response()->json([
-                    'Department' => $department
+            $departments = [];
+            foreach ($request['name'] as $name) {
+                $department = Department::create([
+                    'name' => $name,
+                    'token' => rand(100000, 999999)
                 ]);
+
+                $departments[] = $department;
             }
+
+            return response()->json([
+                'Departments' => $departments
+            ]);
         }
+
     }
 
     /**
