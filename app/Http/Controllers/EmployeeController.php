@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class EmployeeController extends Controller
 {
 
-    public function index()
+    public function employee_list()
     {
         //
         $user = Auth::guard('emp')->user();
@@ -31,7 +31,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function create(Request $request)
+    public function create_employee(Request $request)
     {
         //
         $user = Auth::guard('emp')->user();
@@ -83,9 +83,11 @@ class EmployeeController extends Controller
     }
 
 
-    public function filter(Request $request)
+    public function filter_employee(Request $request)
     {
         //
+        $user = Auth::guard('emp')->user();
+
         $employees_filter = Employee::select('employees.name', 'employees.email', 'departments.name as department_name', 'employees.contact_no', 'employees.dob', 'employees.blood_group', 'employees.address', 'employees.image')
             ->join('departments', 'departments.token', '=', 'employees.department')
             ->where('departments.name', $request->name)
@@ -94,18 +96,20 @@ class EmployeeController extends Controller
         $employee_filter_count = count($employees_filter);
         if ($employee_filter_count >= 1) {
             return response()->json([
+                'user_image'=>$user->image,
+                'user_name'=>$user->name,
                 'Total count' => $employee_filter_count,
                 'filter_list' => $employees_filter
             ]);
         } else {
             return response()->json([
-                'Message' => 'No data '
+                'Message' => 'No data in this department'
             ]);
         }
     }
 
 
-    public function show(Request $request)
+    public function show_employee(Request $request)
     {
         //
         $employee_view = Employee::select('employees.name', 'employees.email', 'employees.contact_no', 'employees.dob', 'employees.blood_group', 'employees.address', 'employees.image', 'departments.name as department name')
@@ -129,7 +133,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function update(Request $request)
+    public function update_employee(Request $request)
     {
         //
         $validate = Validator::make($request->all(), [
@@ -180,7 +184,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function destroy(Request $request)
+    public function destroy_employee(Request $request)
     {
         //
         $employee_delete_count = Employee::select()->where('token', $request->token)->count();
@@ -207,8 +211,9 @@ class EmployeeController extends Controller
             'image' => $user->image
         ]);
     }
-    public function search($name)
+    public function search_employee($name)
     {
+        $user=Auth::guard('emp')->user();
         $search_employee = Employee::select('employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department name')
             ->join('departments', 'employees.department', '=', 'departments.token')
             ->where(function ($join) use ($name) {
@@ -220,6 +225,8 @@ class EmployeeController extends Controller
         $search_count = count($search_employee);
         if ($search_count) {
             return response()->json([
+                'user_image'=>$user->image,
+                'user_name'=>$user->name,
                 'Total_count' => $search_count,
                 'search' => $search_employee
             ], 200);

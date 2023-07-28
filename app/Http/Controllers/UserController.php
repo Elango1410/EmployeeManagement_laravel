@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     //
-    public function register(Request $request)
+    public function register_user(Request $request)
     {
         $validate = Validator::make($request->all(), [
             'name' => 'required|string|min:3',
             'email' => 'required|email',
             'password' => 'required|string|min:4|max:15',
-            'c_password'=>'required|same:password'
+            'c_password' => 'required|same:password'
         ]);
         if ($validate->fails()) {
             return response()->json([
@@ -35,7 +35,7 @@ class UserController extends Controller
                 'token' => rand(100000, 999999),
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' =>$request->password,
+                'password' => $request->password,
                 'image' => $image
             ]);
             $auth_token = $user->createToken('registertoken')->plainTextToken;
@@ -45,12 +45,10 @@ class UserController extends Controller
                 'token' => $auth_token
             ]);
         }
-
-
     }
 
 
-    public function login(Request $request)
+    public function login_user(Request $request)
     {
         $validate = Validator::make($request->all(), [
             'email' => 'required|string',
@@ -75,46 +73,59 @@ class UserController extends Controller
                 ]);
             }
         }
-
-
     }
 
+    public function update_user(Request $request)
+    {
+        $image = "";
+        if ($request->hasFile('image')) {
+            $image = $request->file('image')->store('update', 'public');
+        } else {
+            $image = "null";
+        }
+        $user = User::where('token', $request->token)->update([
+            'name' => $request->name,
+            'image' => $image
+        ]);
+        return response()->json([
+            'name' => $request->name,
+            'image' => $image
+        ]);
+    }
 
-
-    public function logout(Request $request)
+    public function logout_user(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json([
-            'Message'=>'Logout success'
+            'Message' => 'Logout success'
         ]);
-
-
     }
 
 
-    public function change_password(Request $request){
-        $validate=Validator::make($request->all(),[
-            'old_pass'=>'required',
-            'password'=>'required|min:5|max:10',
-            'c_pass'=>'required|same:password'
+    public function change_password(Request $request)
+    {
+        $validate = Validator::make($request->all(), [
+            'old_pass' => 'required',
+            'password' => 'required|min:5|max:10',
+            'c_pass' => 'required|same:password'
         ]);
 
-        if($validate->fails()){
+        if ($validate->fails()) {
             return response()->json([
-                'Error'=>$validate->messages()
+                'Error' => $validate->messages()
             ]);
         }
-        $user=$request->user();
-        if(Hash::check($request->old_pass,$user->password)){
+        $user = $request->user();
+        if (Hash::check($request->old_pass, $user->password)) {
             $user->update([
-                'password'=>Hash::make($request->password)
+                'password' => Hash::make($request->password)
             ]);
             return response()->json([
-                'Message'=>'Password Changed'
+                'Message' => 'Password Changed'
             ]);
-        }else{
+        } else {
             return response()->json([
-                'Message'=>'Old password does not match '
+                'Message' => 'Old password does not match '
             ]);
         }
     }

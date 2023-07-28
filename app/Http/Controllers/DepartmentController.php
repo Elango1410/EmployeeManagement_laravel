@@ -15,7 +15,7 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function department_list()
     {
         //
         $department_list = Department::select('name', 'token')->selectRaw('date_format(created_at, "created on %d-%b-%Y") as date')
@@ -37,7 +37,7 @@ class DepartmentController extends Controller
      * Show the form for creating a new resource.
      */
 
-    public function create(Request $request)
+    public function create_department(Request $request)
     {
         $validate = Validator::make($request->all(), [
             'name' => 'required|array|min:1',
@@ -78,7 +78,7 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request)
+    public function show_department(Request $request)
     {
         //
         $department_view = Department::select('name')->where('token', $request->token)->first();
@@ -98,7 +98,7 @@ class DepartmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update_department(Request $request)
     {
         //
         $department_update = Department::where('token', $request->token)->update([
@@ -113,7 +113,7 @@ class DepartmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function destroy_department(Request $request)
     {
         //
         $depart_delete_count = Department::select('token')->where([['token', $request->token]])->count();
@@ -132,7 +132,7 @@ class DepartmentController extends Controller
         }
     }
 
-    public function search($name)
+    public function search_department($name)
     {
         $department_search = Department::select('name', 'token')->selectRaw('date_format(created_at, "created on %d-%b-%Y") as date')
             ->selectRaw('date_format(created_at, "%l:%i,%p") as time')->where('name', 'LIKE', '%' . $name . '%')->get();
