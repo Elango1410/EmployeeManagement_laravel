@@ -4,30 +4,63 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\EmployeeSkills;
+use App\Models\Skills;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use StdClass;
 
 class EmployeeController extends Controller
 {
 
     public function employee_list()
     {
-        //
+
         $user = Auth::guard('emp')->user();
-        $employees = Employee::select('employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department name')
-            ->join('departments', 'employees.department', '=', 'departments.token')->where('user_token', $user->token)
+        $employees = Employee::select('employees.token', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
+            ->join('departments', 'employees.department', '=', 'departments.token')
+            ->where('user_token', $user->token)
             ->get();
+
         $employee_count = count($employees);
-        if ($employees) {
-            return response()->json([
-                'user_image' => $user->image,
-                'user_name' => $user->name,
-                'employee_count' => $employee_count,
-                'employee_list' => $employees
-            ]);
+
+        $employeeTokens = [];
+        foreach ($employees as $employee) {
+            $employeeTokens[] = $employee->token;
         }
+
+        $emp_skills = Skills::select('skills.name', 'employee_skills.employee_token')
+            ->join('employee_skills', 'skills.token', '=', 'employee_skills.skills_token')
+            ->whereIn('employee_skills.employee_token', $employeeTokens)
+            ->get();
+
+        $arr = [];
+
+        foreach ($employees as $employee) {
+            $obj = new StdClass;
+            $obj->name = $employee->name;
+            $obj->email = $employee->email;
+            $obj->contact_no = $employee->contact_no;
+            $obj->department_name = $employee->department_name;
+            $obj->image = $employee->image;
+            $obj->skills = [];
+
+            $arr[$employee->token] = $obj;
+        }
+
+        foreach ($emp_skills as $skills) {
+            $employeeToken = $skills->employee_token;
+            $arr[$employeeToken]->skills[] = $skills->name;
+        }
+
+        return response()->json([
+            'user_image' => $user->image,
+            'user_name' => $user->name,
+            'employee_count' => $employee_count,
+            'employee_list' => $arr
+        ]);
     }
 
 
@@ -73,6 +106,25 @@ class EmployeeController extends Controller
                 'user_token' => $user->token,
             ]);
 
+
+            $employee_skills = [];
+            $employee_token = $employee->value('token');
+            foreach ($request['skill_token'] as $skill_token) {
+                $employee_skill = EmployeeSkills::create([
+                    'employee_token' => $employee_token,
+                    'skills_token' => $skill_token,
+                    'token' => rand(100000, 999999)
+                ]);
+
+                $employee_skills[] = $employee_skill;
+            }
+
+            return response()->json([
+                'employee_skills' => $employee_skills
+            ]);
+
+
+
             if ($employee) {
                 return response()->json([
                     'Message' => 'One Record created successfully',
@@ -88,18 +140,32 @@ class EmployeeController extends Controller
         //
         $user = Auth::guard('emp')->user();
 
-        $employees_filter = Employee::select('employees.name', 'employees.email', 'departments.name as department_name', 'employees.contact_no', 'employees.dob', 'employees.blood_group', 'employees.address', 'employees.image')
-            ->join('departments', 'departments.token', '=', 'employees.department')
-            ->where('departments.name', $request->name)
-            ->orWhere('employees.blood_group', $request->blood_group)
+        $employee_skill_query = EmployeeSkills::select('employee_skills.employee_token')
+            ->join('skills', 'employee_skills.skills_token', '=', 'skills.token')
+            ->whereIn('skills.name', $request->skill)
+            ->groupBy('employee_skills.employee_token')
             ->get();
-        $employee_filter_count = count($employees_filter);
+
+        $employee_skill_token = [];
+        foreach ($employee_skill_query as $employee_skill_query) {
+            $employee_skill_token[] = $employee_skill_query->employee_token;
+        }
+        // return $employee_skill_token;
+
+        $employee_filter = Employee::select('employees.name as emp_name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
+            ->join('departments', 'departments.token', '=', 'employees.department')
+            ->whereIn('employees.token', $employee_skill_token)
+            ->get();
+
+        $employee_filter_count = count($employee_filter);
+
+
         if ($employee_filter_count >= 1) {
             return response()->json([
-                'user_image'=>$user->image,
-                'user_name'=>$user->name,
+                'user_image' => $user->image,
+                'user_name' => $user->name,
                 'Total count' => $employee_filter_count,
-                'filter_list' => $employees_filter
+                'filter_list' => $employee_filter
             ]);
         } else {
             return response()->json([
@@ -112,24 +178,41 @@ class EmployeeController extends Controller
     public function show_employee(Request $request)
     {
         //
-        $employee_view = Employee::select('employees.name', 'employees.email', 'employees.contact_no', 'employees.dob', 'employees.blood_group', 'employees.address', 'employees.image', 'departments.name as department name')
+        $employee_view = Employee::select('employees.token', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.dob', 'employees.blood_group', 'employees.address', 'employees.image', 'departments.name as department_name')
             ->join('departments', 'employees.department', '=', 'departments.token')->where('employees.token', $request->token)
+            ->first();
+
+        $employeeTokens = $employee_view->token;
+
+        $emp_skills = Skills::select('skills.name', 'employee_skills.employee_token')
+            ->join('employee_skills', 'skills.token', '=', 'employee_skills.skills_token')
+            ->where('employee_skills.employee_token', $employeeTokens)
             ->get();
-        if (count($employee_view) > 0) {
+
+
+        if ($employee_view) {
+            $arr = [];
+            $obj = new StdClass;
+            $obj->name = $employee_view->name;
+            $obj->email = $employee_view->email;
+            $obj->contact_no = $employee_view->contact_no;
+            $obj->department_name = $employee_view->department_name;
+            $obj->image = $employee_view->image;
+            $obj->dob = $employee_view->dob;
+            $obj->blood_group = $employee_view->blood_group;
+            $obj->address = $employee_view->address;
+
+            $obj->skills = [];
+
+            $arr[$employee_view->token] = $obj;
+            foreach ($emp_skills as $emp_skill) {
+                $employeeToken = $emp_skill->employee_token;
+                $arr[$employeeToken]->skills[] = $emp_skill->name;
+            }
             return response()->json([
-                'Employee_view' => $employee_view
-            ]);
-        } else {
-            return response()->json([
-                'Message' => 'No record Found'
+                $obj
             ]);
         }
-    }
-
-
-    public function edit(string $id)
-    {
-        //
     }
 
 
@@ -137,14 +220,13 @@ class EmployeeController extends Controller
     {
         //
         $validate = Validator::make($request->all(), [
-            // 'name' => 'required|string|min:3',
-            'email' => 'required|email',
-            'department' => 'required',
-            'contact_no' => 'required|string|max:10|min:10',
-            'dob' => 'required|date',
-            'blood_group' => 'required|string',
-            'address' => 'required|string',
-            'image' => 'required',
+            'name' => 'required|string|min:3',
+            // 'email' => 'required|email',
+            // 'contact_no' => 'required|string|max:10|min:10',
+            // 'dob' => 'required|date',
+            // 'blood_group' => 'required|string',
+            // 'address' => 'required|string',
+            // 'image' => 'required',
         ]);
         if ($validate->fails()) {
             return response()->json([
@@ -213,20 +295,23 @@ class EmployeeController extends Controller
     }
     public function search_employee($name)
     {
-        $user=Auth::guard('emp')->user();
+        $user = Auth::guard('emp')->user();
         $search_employee = Employee::select('employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department name')
             ->join('departments', 'employees.department', '=', 'departments.token')
+            ->join('employee_skills', 'employees.token', '=', 'employee_skills.employee_token')
+            ->join('skills', 'skills.token', '=', 'employee_skills.skills_token')
             ->where(function ($join) use ($name) {
-                $join->where('employees.name', 'LIKE', '%' . $name . '%')->orWhere('employees.blood_group', 'LIKE', '%' . $name . '%')
-                    ->orWhere('departments.name', 'LIKE', '%' . $name . '%')
-                    ->orWhere('employees.email', 'LIKE', '%' . $name . '%');
-            })->get();
+                $join->where('employees.name', 'LIKE', '%' . $name . '%')
+                    ->orWhere('departments.name', 'LIKE', '%' . $name . '%');
 
+            })->distinct()->get();
+
+            // return $search_employee;
         $search_count = count($search_employee);
         if ($search_count) {
             return response()->json([
-                'user_image'=>$user->image,
-                'user_name'=>$user->name,
+                'user_image' => $user->image,
+                'user_name' => $user->name,
                 'Total_count' => $search_count,
                 'search' => $search_employee
             ], 200);

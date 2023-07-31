@@ -36,6 +36,7 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => $request->password,
+                'pass' => $request->password,
                 'image' => $image
             ]);
             $auth_token = $user->createToken('registertoken')->plainTextToken;
@@ -106,7 +107,7 @@ class UserController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'old_pass' => 'required',
-            'password' => 'required|min:5|max:10',
+            'password' => 'required|min:5|max:20',
             'c_pass' => 'required|same:password'
         ]);
 

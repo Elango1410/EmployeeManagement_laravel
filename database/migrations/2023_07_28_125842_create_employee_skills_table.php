@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employees', function (Blueprint $table) {
-            //
-            $table->string('user_token');
+        Schema::create('employee_skills', function (Blueprint $table) {
+            $table->id();
+            $table->string('token');
+            $table->string('employee_token')->index();
+            $table->string('skills_token')->index();
+            $table->timestamps();
         });
     }
 
@@ -22,9 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('employees', function (Blueprint $table) {
-            //
-            $table->dropColumn('user_token');
-        });
+        Schema::dropIfExists('employee_skills');
     }
 };

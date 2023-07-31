@@ -19,6 +19,7 @@ class Employee extends Model
         'blood_group',
         'address',
         'image',
+        // 'skill',
         'user_token',
     ];
 }

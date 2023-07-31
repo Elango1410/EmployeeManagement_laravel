@@ -3,8 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\DepartmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,11 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
 Route::post('user/logout',[UserController::class,'logout_user']);
 Route::post('user/change_password',[UserController::class,'change_password']);
 Route::post('user/update_user',[UserController::class,'update_user']);
+
+Route::post('skills/create',[SkillsController::class,'create_skills']);
+Route::post('skills/list',[SkillsController::class,'list_skills']);
+Route::post('skills/delete',[SkillsController::class,'remove_skill']);
+
 
 
 Route::post('department/create',[DepartmentController::class,'create_department']);

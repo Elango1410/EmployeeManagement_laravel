@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\EmployeeSkills;
+use App\Models\Skills;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -64,7 +66,6 @@ class DepartmentController extends Controller
                 'Departments' => $departments
             ]);
         }
-
     }
 
     /**
@@ -160,12 +161,22 @@ class DepartmentController extends Controller
             $arr['department'] = $depart_name->name;
         }
 
-        $dept = Department::select('employees.image', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.address')
+        $dept = Department::select('employees.token as emp_token', 'employees.image', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.address')
             ->join('employees', 'employees.department', '=', 'departments.token')
-            ->where('departments.token', $request->token)
+            ->where('departments.token', $request->token)->distinct()
             ->get();
 
         $dept_count = count($dept);
+
+        $employeeTokens = [];
+        foreach ($dept as $dept_token) {
+            $employeeTokens[] = $dept_token->emp_token;
+        }
+
+        $emp_skills = Skills::select('skills.name')
+            ->join('employee_skills', 'skills.token', '=', 'employee_skills.skills_token')
+            ->where('employee_skills.employee_token', $employeeTokens)
+            ->get();
 
         if ($dept_count > 0) {
 
@@ -176,13 +187,16 @@ class DepartmentController extends Controller
                 $obj->email = $depart->email;
                 $obj->contact_no = $depart->contact_no;
                 $obj->address = $depart->address;
-                $arr['employees'][] = $obj;
-                // array_push($arr,$obj);
+                $arr[$depart->token] = $obj;
             }
 
+            foreach ($emp_skills as $skills) {
+                $employeeToken = $skills->employee_token;
+                $arr[$employeeToken]->skills[] = $skills->name;
+            }
             return response()->json([
                 'Total count' => $dept_count,
-                'data' => $arr
+                  'employee' => array_values($arr)
             ]);
         } else {
             return response()->json([
