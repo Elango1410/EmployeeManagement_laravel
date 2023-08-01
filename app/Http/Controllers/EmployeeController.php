@@ -269,8 +269,6 @@ class EmployeeController extends Controller
         if (empty($token)) {
             return response()->json(['Message' => 'Invalid input'], 400);
         }
-
-
         $employee_delete_count = Employee::where('token', $token)->count();
         if ($employee_delete_count === 0) {
             return response()->json(['Message' => 'No record found'], 404);
