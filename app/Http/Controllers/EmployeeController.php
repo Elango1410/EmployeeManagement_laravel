@@ -272,15 +272,12 @@ class EmployeeController extends Controller
         $employee_delete_count = Employee::where('token', $token)->count();
         if ($employee_delete_count === 0) {
             return response()->json(['Message' => 'No record found'], 404);
-        }else{
+        } else {
             EmployeeSkills::whereIn('employee_token', $token)->delete();
-        Employee::whereIn('token', $token)->delete();
+            Employee::whereIn('token', $token)->delete();
 
-        return response()->json(['Message' => 'Record deleted successfully'], 200);
+            return response()->json(['Message' => 'Record deleted successfully'], 200);
         }
-
-
-
     }
 
 
