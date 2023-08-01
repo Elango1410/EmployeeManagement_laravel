@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Notifications\EmailNotification;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -128,7 +129,7 @@ class UserController extends Controller
         if (Hash::check($request->old_pass, $user->password)) {
             $user->update([
                 'password' => Hash::make($request->password),
-                'pass'=>$request->password
+                'pass' => $request->password
             ]);
             return response()->json([
                 'Message' => 'Password Changed'
@@ -177,5 +178,25 @@ class UserController extends Controller
         }
     }
 
+    public function resetPasswordLoad(Request $request)
+    {
+        $resetData = PasswordReset::where('token', $request->token)->get();
+        if (isset($request->token) && count($resetData) > 0) {
+            $user = User::where('email', $resetData[0]['email'])->get();
+            return view('resetPassword', compact('user'));
+        }
+    }
 
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'password' => '|required|string|min:3|same:confirm_password'
+        ]);
+        $user = User::find($request->id);
+        $user->password = $request->password;
+        $user->pass = $request->password;
+        $user->save();
+
+        return "<h1>Password Changed successfully.</h1>";
+    }
 }

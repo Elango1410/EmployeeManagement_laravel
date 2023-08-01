@@ -3,6 +3,7 @@
 
 <head>
     <title>{{ $data['title'] }}</title>
+        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 </head>
 
 <body>
