@@ -19,9 +19,9 @@ class EmployeeController extends Controller
     {
 
         $user = Auth::guard('emp')->user();
-        $employees = Employee::select('employees.token', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
+        $employees = Employee::select('employees.token','employees.id', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
             ->join('departments', 'employees.department', '=', 'departments.token')
-            ->where('user_token', $user->token)
+            ->where('user_token', $user->token)->orderBy('name', 'DESC')
             ->get();
 
         $employee_count = count($employees);
@@ -245,6 +245,13 @@ class EmployeeController extends Controller
                 'address' => $request->address,
                 'image' => $image,
             ]);
+            $skillTokens = $request['skill'];
+            $employeeToken = $request->token;
+
+            foreach ($skillTokens as $skillToken) {
+               $usr= EmployeeSkills::where('employee_token', $employeeToken)
+                             ->update(['skills_token' => $skillToken]);
+            }
 
             return response()->json([
                 'name' => $request->name,
