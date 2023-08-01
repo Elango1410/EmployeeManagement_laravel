@@ -51,6 +51,6 @@ Route::post('employee/search/{name}',[EmployeeController::class,'search_employee
 });
 
 
-
+Route::post('forget-password', [UserController::class, 'forgetPassword']);
 Route::post('user/register',[UserController::class,'register_user']);
 Route::post('user/login',[UserController::class,'login_user']);

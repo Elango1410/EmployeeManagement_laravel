@@ -119,12 +119,6 @@ class EmployeeController extends Controller
                 $employee_skills[] = $employee_skill;
             }
 
-            return response()->json([
-                'employee_skills' => $employee_skills
-            ]);
-
-
-
             if ($employee) {
                 return response()->json([
                     'Message' => 'One Record created successfully',
@@ -268,19 +262,29 @@ class EmployeeController extends Controller
 
     public function destroy_employee(Request $request)
     {
-        //
-        $employee_delete_count = Employee::select()->where('token', $request->token)->count();
-        if ($employee_delete_count > 0) {
-            $employee_delete = Employee::select()->where('token', $request->token)->delete();
-            return response()->json([
-                'Message' => 'Record deleted successfully'
-            ]);
-        } else {
-            return response()->json([
-                'Message' => 'No record found'
-            ]);
+
+        $token = $request->input('token');
+
+
+        if (empty($token)) {
+            return response()->json(['Message' => 'Invalid input'], 400);
         }
+
+
+        $employee_delete_count = Employee::where('token', $token)->count();
+        if ($employee_delete_count === 0) {
+            return response()->json(['Message' => 'No record found'], 404);
+        }else{
+            EmployeeSkills::whereIn('employee_token', $token)->delete();
+        Employee::whereIn('token', $token)->delete();
+
+        return response()->json(['Message' => 'Record deleted successfully'], 200);
+        }
+
+
+
     }
+
 
 
     public function profile()
@@ -303,10 +307,9 @@ class EmployeeController extends Controller
             ->where(function ($join) use ($name) {
                 $join->where('employees.name', 'LIKE', '%' . $name . '%')
                     ->orWhere('departments.name', 'LIKE', '%' . $name . '%');
-
             })->distinct()->get();
 
-            // return $search_employee;
+        // return $search_employee;
         $search_count = count($search_employee);
         if ($search_count) {
             return response()->json([

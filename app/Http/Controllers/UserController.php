@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PasswordReset;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Notifications\EmailNotification;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -40,10 +46,12 @@ class UserController extends Controller
                 'image' => $image
             ]);
             $auth_token = $user->createToken('registertoken')->plainTextToken;
-
+            $user->notify(new EmailNotification($user));
             return response()->json([
                 'admin' => $user,
-                'token' => $auth_token
+                'token' => $auth_token,
+                'Message' => 'Registered Successfully and Your Credentials sent to your Registered email '
+
             ]);
         }
     }
@@ -119,7 +127,8 @@ class UserController extends Controller
         $user = $request->user();
         if (Hash::check($request->old_pass, $user->password)) {
             $user->update([
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'pass'=>$request->password
             ]);
             return response()->json([
                 'Message' => 'Password Changed'
@@ -130,4 +139,43 @@ class UserController extends Controller
             ]);
         }
     }
+
+
+    public function forgetPassword(Request $request)
+    {
+        $user = User::where('email', $request->email)->get();
+        if (count($user) > 0) {
+            $token = Str::random(40);
+            $domain = URL::to('/');
+            $url = $domain . '/reset-password?token=' . $token;
+
+            $data['url'] = $url;
+            $data['email'] = $request->email;
+            $data['title'] = 'Password Reset';
+            $data['body'] = 'Click this link to reset your password..';
+            Mail::send('forgetPasswordMail', ['data' => $data], function ($message) use ($data) {
+                $message->to($data['email'])->subject($data['title']);
+            });
+
+            $datetime = Carbon::now()->format('Y-m-d H:i:s');
+            PasswordReset::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'email' =>  $request->email,
+                    'token' => $token,
+                    'created_at' => $datetime
+                ]
+            );
+
+            return response()->json([
+                'success' => true, 'msg' => 'Please check your email to reset password'
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'No data found'
+            ]);
+        }
+    }
+
+
 }
