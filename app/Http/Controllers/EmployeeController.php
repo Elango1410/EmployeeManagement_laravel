@@ -45,15 +45,15 @@ class EmployeeController extends Controller
             $obj->contact_no = $employee->contact_no;
             $obj->department_name = $employee->department_name;
             $obj->image = $employee->image;
-            $obj->skills = [];
+            // $obj->skills = [];
 
             $arr[$employee->token] = $obj;
         }
 
-        foreach ($emp_skills as $skills) {
-            $employeeToken = $skills->employee_token;
-            $arr[$employeeToken]->skills[] = $skills->name;
-        }
+        // foreach ($emp_skills as $skills) {
+        //     $employeeToken = $skills->employee_token;
+        //     $arr[$employeeToken]->skills[] = $skills->name;
+        // }
 
         return response()->json([
             'user_image' => $user->image,
@@ -108,7 +108,8 @@ class EmployeeController extends Controller
 
 
             $employee_skills = [];
-            $employee_token = $employee->value('token');
+            $employee_token = $employee->token;
+            // return $employee_token;
             foreach ($request['skill_token'] as $skill_token) {
                 $employee_skill = EmployeeSkills::create([
                     'employee_token' => $employee_token,
