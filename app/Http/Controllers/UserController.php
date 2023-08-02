@@ -145,20 +145,23 @@ class UserController extends Controller
     public function forgetPassword(Request $request)
     {
         $user = User::where('email', $request->email)->get();
+
         if (count($user) > 0) {
             $token = Str::random(40);
             $domain = URL::to('/');
             $url = $domain . '/reset-password?token=' . $token;
-
             $data['url'] = $url;
             $data['email'] = $request->email;
             $data['title'] = 'Password Reset';
             $data['body'] = 'Click this link to reset your password..';
+
             Mail::send('forgetPasswordMail', ['data' => $data], function ($message) use ($data) {
                 $message->to($data['email'])->subject($data['title']);
             });
 
             $datetime = Carbon::now()->format('Y-m-d H:i:s');
+
+
             PasswordReset::updateOrCreate(
                 ['email' => $request->email],
                 [

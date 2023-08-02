@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use StdClass;
 use App\Models\User;
-use App\Models\Employee;
-use App\Models\EmployeeSkills;
 use App\Models\Skills;
+use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Models\EmployeeSkills;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use StdClass;
 
 class EmployeeController extends Controller
 {
+
+
 
     public function employee_list()
     {
