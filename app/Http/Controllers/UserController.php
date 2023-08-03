@@ -38,6 +38,8 @@ class UserController extends Controller
                 $image = "null";
             }
 
+            $user_select=User::select('token')->where('email',$request->email)->get();
+            if(count($user_select)===0){
             $user = User::create([
                 'token' => rand(100000, 999999),
                 'name' => $request->name,
@@ -54,6 +56,12 @@ class UserController extends Controller
                 'Message' => 'Registered Successfully and Your Credentials sent to your Registered email '
 
             ]);
+        }else{
+            return response()->json([
+                'Message' => 'email already taken'
+
+            ]);
+        }
         }
     }
 

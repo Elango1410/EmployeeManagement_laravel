@@ -17,6 +17,6 @@ use App\Http\Controllers\UserController;
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::get('users', ['uses'=>'EmployeeController@index', 'as'=>'users.index']);
 Route::get('/reset-password',[UserController::class,'resetPasswordLoad']);
 Route::post('/reset-password',[UserController::class,'resetPassword']);
