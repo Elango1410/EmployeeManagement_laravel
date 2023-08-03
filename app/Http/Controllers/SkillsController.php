@@ -40,12 +40,13 @@ class SkillsController extends Controller
 
     public function list_skills()
     {
-        $skills=Skills::select('name','token')->get();
-        $skills_count=count($skills);
+        $skills=Skills::select('name');
+        $skill=$skills->addSelect('token')->get();
+        $skills_count=count($skill);
         if($skills_count>0){
             return response()->json([
                 'skills_count'=>$skills_count,
-                'list'=>$skills
+                'list'=>$skill
             ]);
         }
     }

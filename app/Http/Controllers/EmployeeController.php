@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use StdClass;
 use App\Models\User;
 use App\Models\Skills;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\EmployeeSkills;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -26,11 +28,15 @@ class EmployeeController extends Controller
 
 
             $user = Auth::guard('emp')->user();
+            $datetime = new DateTime('NOW');
+            // $datetime->modify('- 3 days');
+            $backDate = $datetime->format('Y-m-d');
             $employees = Employee::select('employees.token', 'employees.id', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
                 ->join('departments', 'employees.department', '=', 'departments.token')
-                ->where('user_token', $user->token)->orderBy('name', 'DESC')
+                ->whereMonth('employees.created_at', Carbon::now()->month)
+                ->orderBy('employees.created_at', 'DESC')
                 ->get();
-
+            // return $employees;
             $employee_count = count($employees);
 
             $employeeTokens = [];
@@ -38,38 +44,48 @@ class EmployeeController extends Controller
                 $employeeTokens[] = $employee->token;
             }
 
-            $emp_skills = Skills::select('skills.name', 'employee_skills.employee_token')
+            $emp_skills = Skills::select('skills.name', 'employee_skills.employee_token', 'employee_skills.skills_token')
                 ->join('employee_skills', 'skills.token', '=', 'employee_skills.skills_token')
                 ->whereIn('employee_skills.employee_token', $employeeTokens)
                 ->get();
-
-            $arr = [];
-
+            // $emp_skills_sum=$emp_skills->sum('skills_token');
+            $employeeList = [];
+            $slno = 1;
             foreach ($employees as $employee) {
                 $obj = new StdClass;
+                $obj->slno = $slno;
                 $obj->name = $employee->name;
                 $obj->email = $employee->email;
                 $obj->contact_no = $employee->contact_no;
                 $obj->department_name = $employee->department_name;
                 $obj->image = $employee->image;
-                // $obj->skills = [];
-
+                $obj->skills = [];
+                $slno++;
                 $arr[$employee->token] = $obj;
             }
-
-            // foreach ($emp_skills as $skills) {
-            //     $employeeToken = $skills->employee_token;
-            //     $arr[$employeeToken]->skills[] = $skills->name;
-            // }
+            foreach ($emp_skills as $skills) {
+                $employeeToken = $skills->employee_token;
+                $arr[$employeeToken]->skills[] = $skills->name;
+            }
+            foreach ($arr as $employee) {
+                $employeeList[] = (array) $employee;
+            }
 
             return response()->json([
-                'user_image' => $user->image,
-                'user_name' => $user->name,
+                'status_code' => 200,
+                'message' => 'employee List',
+                'title' => 'Success',
                 'employee_count' => $employee_count,
-                'employee_list' => $arr
+                'data' => $employeeList
             ]);
         } else {
-            return 'no data';
+            return response()->json([
+                'status_code' => 400,
+                'message' => 'Invalid data',
+                'title' => 'Failed',
+                'employee_count' => 0,
+                'data' => []
+            ]);
         }
     }
 
@@ -138,8 +154,17 @@ class EmployeeController extends Controller
 
             if ($employee) {
                 return response()->json([
-                    'Message' => 'One Record created successfully',
-                    'Emaployee' => $employee
+                    'status_code' => 200,
+                    'title' => 'Success',
+                    'Message' => 'Record created successfully',
+                    'Employee' => $employee
+                ]);
+            } else {
+                return response()->json([
+                    'status_code' => 400,
+                    'title' => 'Failed',
+                    'Message' => 'Record not created',
+                    'Employee' => []
                 ]);
             }
         } else {
