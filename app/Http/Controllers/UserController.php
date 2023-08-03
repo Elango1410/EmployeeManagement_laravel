@@ -58,8 +58,9 @@ class UserController extends Controller
             ]);
         }else{
             return response()->json([
+                "status_code"=>400,
+                'title'=>'fail',
                 'Message' => 'email already taken'
-
             ]);
         }
         }
