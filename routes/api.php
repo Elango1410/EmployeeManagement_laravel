@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DownloadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,5 +55,3 @@ Route::post('employee/search/{name}',[EmployeeController::class,'search_employee
 Route::post('forget-password', [UserController::class, 'forgetPassword']);
 Route::post('user/register',[UserController::class,'register_user']);
 Route::post('user/login',[UserController::class,'login_user']);
-
-
