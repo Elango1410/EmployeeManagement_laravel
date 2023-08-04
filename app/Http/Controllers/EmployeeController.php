@@ -46,7 +46,7 @@ class EmployeeController extends Controller
 
             $emp_skills = Skills::select('skills.name', 'employee_skills.employee_token', 'employee_skills.skills_token')
                 ->join('employee_skills', 'skills.token', '=', 'employee_skills.skills_token')
-                ->whereIn('employee_skills.employee_token', $employeeTokens)
+                ->whereIn('employee_skills.employee_token', $employeeTokens)->distinct()
                 ->get();
             // $emp_skills_sum=$emp_skills->sum('skills_token');
             $employeeList = [];
