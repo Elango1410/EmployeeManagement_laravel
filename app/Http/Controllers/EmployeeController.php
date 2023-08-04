@@ -50,6 +50,7 @@ class EmployeeController extends Controller
             // $emp_skills_sum=$emp_skills->sum('skills_token');
             $employeeList = [];
             $slno = 1;
+
             foreach ($employees as $employee) {
                 $obj = new StdClass;
                 $obj->slno = $slno;
@@ -57,10 +58,14 @@ class EmployeeController extends Controller
                 $obj->email = $employee->email;
                 $obj->contact_no = $employee->contact_no;
                 $obj->department_name = $employee->department_name;
-                $obj->image = $employee->image;
+                $obj->image = [];
                 $obj->skills = [];
                 $slno++;
                 $arr[$employee->token] = $obj;
+            }
+            foreach($employees as $img){
+                $employeeTok=$img->token;
+                $arr[$employeeTok]->image[]=$img->image;
             }
             foreach ($emp_skills as $skills) {
                 $employeeToken = $skills->employee_token;
