@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Notifications;
 use App\Models\UsersNotification;
 use App\Models\UsersTab;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class NotificationController extends Controller
 {
@@ -14,8 +19,7 @@ class NotificationController extends Controller
      */
     public function index()
     {
-     return 1;
-
+        return 1;
     }
 
     /**
@@ -23,32 +27,31 @@ class NotificationController extends Controller
      */
     public function create(Request $request)
     {
-        //
+
         $type = $request->type;
         $notification = Notifications::create([
             'token' => rand(100000, 999999),
             'type' => $type,
-            'title'=>$request->title,
+            'title' => $request->title,
             'description' => $request->description
         ]);
-$notification_token=$notification->token;
-        $user_token=UsersTab::select('token')->where('type',$type);
+        $notification_token = $notification->token;
+        $user_token = UsersTab::select('token')->where('type', $type);
 
 
         foreach ($user_token as $userToken) {
-        $user_notification=UsersNotification::create([
-            'token'=>rand(100000,999999),
-            'user_token'=>$userToken,
-            'notification_token'=>$notification_token,
+            $user_notification = UsersNotification::create([
+                'token' => rand(100000, 999999),
+                'user_token' => $userToken,
+                'notification_token' => $notification_token,
 
+            ]);
+        }
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'created successfull'
         ]);
-    }
-
-    return response()->json([
-        'status_code'=>200,
-        'message'=>'created successfull'
-    ]);
-
     }
 
     /**
