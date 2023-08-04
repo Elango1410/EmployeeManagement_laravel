@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
@@ -29,7 +30,7 @@ class EmployeeController extends Controller
 
             $user = Auth::guard('emp')->user();
             $date = Carbon::today()->subDays(5);
-            // $users = User::where('created_at','>=',$date)->get();
+
             $employees = Employee::select('employees.token', 'employees.id', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
                 ->join('departments', 'employees.department', '=', 'departments.token')
                 ->orderBy('employees.created_at', 'DESC')
