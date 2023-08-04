@@ -28,13 +28,12 @@ class EmployeeController extends Controller
 
 
             $user = Auth::guard('emp')->user();
-            $datetime = new DateTime('NOW');
-            // $datetime->modify('- 3 days');
-            $backDate = $datetime->format('Y-m-d');
+            $date = Carbon::today()->subDays(5);
+            // $users = User::where('created_at','>=',$date)->get();
             $employees = Employee::select('employees.token', 'employees.id', 'employees.name', 'employees.email', 'employees.contact_no', 'employees.image', 'departments.name as department_name')
                 ->join('departments', 'employees.department', '=', 'departments.token')
-                ->whereMonth('employees.created_at', Carbon::now()->month)
                 ->orderBy('employees.created_at', 'DESC')
+                ->where('employees.created_at', '>=', $date)
                 ->get();
             // return $employees;
             $employee_count = count($employees);
