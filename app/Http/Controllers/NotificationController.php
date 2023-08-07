@@ -35,8 +35,6 @@ class NotificationController extends Controller
                 'type' => $type,
                 'title' => $request->title,
                 'description' => $request->description
-
-
             ]);
         $notificationToken[] = $notification->token;
 
