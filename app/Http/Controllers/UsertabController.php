@@ -168,43 +168,42 @@ class UsertabController extends Controller
                     'data' => []
                 ]);
             }
-        } else if($type==4){
+        } else if ($type == 4) {
             //recently joined
-            $date=Carbon::today()->subDays(30);
-            $recent_join=UsersTab::select('token','mobile_number','imr_number')
-            ->selectraw('date_format(created_at, "%d/%m/%Y") as date')
-            ->orderBy('created_at','DESC')
-            ->where('created_at','>=',$date)->get();
-// return $recent_join;
-            $recent_join_count=count($recent_join);
+            $date = Carbon::today()->subDays(30);
+            $recent_join = UsersTab::select('token', 'mobile_number', 'imr_number')
+                ->selectraw('date_format(created_at, "%d/%m/%Y") as date')
+                ->orderBy('created_at', 'DESC')
+                ->where('created_at', '>=', $date)->get();
+            // return $recent_join;
+            $recent_join_count = count($recent_join);
 
-            if($recent_join_count>1){
-                $slno=1;
-                $recent_arr=[];
-                foreach($recent_join as $recent_join){
-                    $obj=new StdClass;
-                    $obj->slno=$slno;
-                    $obj->mobile_number=$recent_join->mobile_number;
-                    $obj->license_number=$recent_join->imr_number;
-                    $obj->registered_date=$recent_join->date;
+            if ($recent_join_count > 1) {
+                $slno = 1;
+                $recent_arr = [];
+                foreach ($recent_join as $recent_join) {
+                    $obj = new StdClass;
+                    $obj->slno = $slno;
+                    $obj->mobile_number = $recent_join->mobile_number;
+                    $obj->license_number = $recent_join->imr_number;
+                    $obj->registered_date = $recent_join->date;
                     $slno++;
-                    array_push($recent_arr,$obj);
+                    array_push($recent_arr, $obj);
                 }
                 return response()->json([
-                    'status_code'=>200,
-                    'title'=>'Success',
-                    'message'=>'recent joined list',
-                    'Total Count'=>$recent_join_count,
-                    'data'=>$recent_arr
+                    'status_code' => 200,
+                    'title' => 'Success',
+                    'message' => 'recent joined list',
+                    'Total Count' => $recent_join_count,
+                    'data' => $recent_arr
                 ]);
-
-            }else{
+            } else {
                 return response()->json([
-                    'status_code'=>400,
-                    'title'=>'Fails',
-                    'message'=>'No list',
-                    'Total Count'=>0,
-                    'data'=>[]
+                    'status_code' => 400,
+                    'title' => 'Fails',
+                    'message' => 'No list',
+                    'Total Count' => 0,
+                    'data' => []
                 ]);
             }
         }
