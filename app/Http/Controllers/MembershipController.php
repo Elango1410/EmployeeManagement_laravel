@@ -86,12 +86,7 @@ class MembershipController extends Controller
     public function edit(Request $request)
     {
 
-        $plan_edit = Memberships::where('plan_id', $request->plan_id)->update([
-            'plan_name' => $request->plan_name,
-            'plan_duration' => $request->plan_duration,
-            'plan_amount' => $request->plan_amount,
-            'benefits' => $request->benefits
-        ]);
+        $plan_edit = Memberships::where('plan_id', $request->plan_id)->update($request->only(['plan_name', 'plan_amount', 'plan_duration', 'benefits']));
         if ($plan_edit) {
             return response()->json([
                 'status_code' => 200,
