@@ -16,12 +16,12 @@ class MembershipController extends Controller
         $member_list = Memberships::select('plan_id', 'plan_name', 'plan_duration', 'plan_amount')
             ->selectRaw('date_format(created_at, "%d/%m/%Y") as date')
             ->get();
-            $member_list_count=count($member_list);
+        $member_list_count = count($member_list);
         return response()->json([
             'status_code' => 200,
             'title' => 'success',
             'message' => 'membership list',
-            'total count'=>$member_list_count,
+            'total count' => $member_list_count,
             'data' => $member_list
         ]);
     }
@@ -37,13 +37,13 @@ class MembershipController extends Controller
             'plan_duration' => $request->plan_duration,
             'plan_amount' => $request->plan_amount,
             'benefits' => $request->benefits,
-            'expiry_date'=>$request->expiry_date
+            'expiry_date' => $request->expiry_date
         ]);
 
         return response()->json([
             'status_code' => 200,
             'title' => 'Success',
-            'message' => 'Plane created Successfully',
+            'message' => 'Plan created Successfully',
             'data' => $membership
         ]);
     }
