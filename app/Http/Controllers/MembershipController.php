@@ -80,9 +80,25 @@ class MembershipController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request)
     {
         //
+
+        $plan_edit=Memberships::where('plan_id',$request->plan_id)->update([
+            'plan_name'=>$request->plan_name,
+            'plan_duration'=>$request->plan_duration,
+            'plan_amount'=>$request->plan_amount,
+            'benefits'=>$request->benefits
+        ]);
+        if($plan_edit){
+            return response()->json([
+                'status_code'=>200,
+                'title'=>'Success',
+                'message'=>'Updated Successfully',
+                'data'=>[]
+            ]);
+        }
+
     }
 
     /**

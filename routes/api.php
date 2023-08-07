@@ -54,6 +54,8 @@ Route::post('plan_create',[MembershipController::class,'create']);
 Route::post('plan_list',[MembershipController::class,'index']);
 Route::post('plan_view',[MembershipController::class,'show']);
 Route::post('plan_delete',[MembershipController::class,'destroy']);
+Route::post('plan_edit',[MembershipController::class,'edit']);
+
 
 
 
