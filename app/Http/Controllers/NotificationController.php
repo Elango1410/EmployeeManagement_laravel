@@ -35,15 +35,16 @@ class NotificationController extends Controller
             'title' => $request->title,
             'description' => $request->description
         ]);
-        $notification_token = $notification->token;
-        $user_token = UsersTab::select('token')->where('type', $type);
-
+        $notificationToken = $notification->token;
+        // return $notificationToken;
+        $user_token = UsersTab::select('token')->where('type', $type)->get();
+// return $user_token;
 
         foreach ($user_token as $userToken) {
             $user_notification = UsersNotification::create([
                 'token' => rand(100000, 999999),
-                'user_token' => $userToken,
-                'notification_token' => $notification_token,
+                'user_token' => $userToken->token,
+                'notification_token' => $notificationToken,
 
             ]);
         }
