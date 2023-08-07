@@ -27,31 +27,42 @@ class NotificationController extends Controller
      */
     public function create(Request $request)
     {
-
-        $type = $request->type;
-        $notification = Notifications::create([
-            'token' => rand(100000, 999999),
-            'type' => $type,
-            'title' => $request->title,
-            'description' => $request->description
-        ]);
-        $notificationToken = $notification->token;
-        // return $notificationToken;
-        $user_token = UsersTab::select('token')->where('type', $type)->get();
-// return $user_token;
-
-        foreach ($user_token as $userToken) {
-            $user_notification = UsersNotification::create([
+        $notification=[];
+        // $type[] = $request->type;
+        foreach($request['type'] as $type){
+            $notification = Notifications::create([
                 'token' => rand(100000, 999999),
-                'user_token' => $userToken->token,
-                'notification_token' => $notificationToken,
+                'type' => $type,
+                'title' => $request->title,
+                'description' => $request->description
+
 
             ]);
+        $notificationToken[] = $notification->token;
+
         }
+
+            return $notificationToken;
+
+
+        // $user_token = UsersTab::select('token')->where('type', $type)->get();
+        // // return $user_token;
+
+        // foreach ($user_token as $userToken) {
+        //     $user_notification = UsersNotification::create([
+        //         'token' => rand(100000, 999999),
+        //         'user_token' => $userToken->token,
+        //         'notification_token' => $notificationToken,
+
+        //     ]);
+        // }
 
         return response()->json([
             'status_code' => 200,
-            'message' => 'created successfull'
+            'message' => 'Created successfully',
+            'title' => 'Success',
+            'data' => []
+
         ]);
     }
 
