@@ -70,8 +70,8 @@ class UsertabController extends Controller
                     $obj->education = $active_user->education;
                     $obj->location = $active_user->location;
                     $obj->imr_number = $active_user->imr_number;
-                    $obj->type = $active_user->type;
                     $obj->registrationDate = $active_user->date;
+                    $obj->type = $active_user->type;
                     $slno++;
                     array_push($active_arr, $obj);
                 }
@@ -109,8 +109,8 @@ class UsertabController extends Controller
                     $obj->education = $blocked_user->education;
                     $obj->location = $blocked_user->location;
                     $obj->imr_number = $blocked_user->imr_number;
-                    $obj->type = $blocked_user->type;
                     $obj->registrationDate = $blocked_user->date;
+                    $obj->type = $blocked_user->type;
                     $slno++;
                     array_push($block_arr, $obj);
                 }
@@ -148,8 +148,8 @@ class UsertabController extends Controller
                     $obj->education = $inactive_user->education;
                     $obj->location = $inactive_user->location;
                     $obj->imr_number = $inactive_user->imr_number;
-                    $obj->type = $inactive_user->type;
                     $obj->registrationDate = $inactive_user->date;
+                    $obj->type = $inactive_user->type;
                     $slno++;
                     array_push($inactive_arr, $obj);
                 }
