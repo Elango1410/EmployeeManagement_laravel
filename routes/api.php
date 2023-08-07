@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\NotificationController;
 
 /*
@@ -47,6 +48,16 @@ Route::post('employee/search/{name}',[EmployeeController::class,'search_employee
 Route::post('noti_view',[NotificationController::class,'show']);
 Route::post('create_noti',[NotificationController::class,'create']);
 Route::post('noti_list',[NotificationController::class,'index']);
+
+
+Route::post('plan_create',[MembershipController::class,'create']);
+Route::post('plan_list',[MembershipController::class,'index']);
+Route::post('plan_view',[MembershipController::class,'show']);
+Route::post('plan_delete',[MembershipController::class,'destroy']);
+
+
+
+
 });
 
 

@@ -17,6 +17,7 @@ class Notifications extends Model
         'title',
         'description',
         'status',
+        'payment_date'
 
     ];
 }

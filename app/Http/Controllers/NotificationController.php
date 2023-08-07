@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UsersTab;
 use Illuminate\Http\Request;
 use App\Models\Notifications;
+use Illuminate\Support\Carbon;
 use App\Models\UsersNotification;
-use App\Models\UsersTab;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Notifications\Notification;
 
 class NotificationController extends Controller
 {
@@ -19,7 +21,14 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        return 1;
+        $notification_list = Notifications::select('token', 'title', 'description', 'type','payment_date')->get();
+
+        return response()->json([
+            'status_code' => 200,
+            'title' => 'success',
+            'message' => 'Notification List',
+            'data' => $notification_list
+        ]);
     }
 
     /**
@@ -29,12 +38,16 @@ class NotificationController extends Controller
     {
 
         $type = $request->type;
-// return $type;
+        // return $type;
+        $noti_date = Carbon::today()->addDays(7);
+        // $noti_date = Carbon::today()-> addWeeks(2);
+        // return $noti_date;
         $notification = Notifications::create([
             'token' => rand(100000, 999999),
             'type' => $type,
             'title' => $request->title,
-            'description' => $request->description
+            'description' => $request->description,
+            'payment_date' => $noti_date
         ]);
         $notificationToken = $notification->token;
         // return $notificationToken;
@@ -76,15 +89,15 @@ class NotificationController extends Controller
     public function show(Request $request)
     {
         //
-        $token= $request->token;
-        $notification_view=Notifications::select('token','type','title','description')
-        ->where('token',$token)->get();
+        $token = $request->token;
+        $notification_view = Notifications::select('token', 'type', 'title', 'description')
+            ->where('token', $token)->get();
 
         return response()->json([
-            'status_code'=>200,
-            'title'=>'Success',
-            'message'=>'Notification view',
-            'data'=>$notification_view
+            'status_code' => 200,
+            'title' => 'Success',
+            'message' => 'Notification view',
+            'data' => $notification_view
         ]);
     }
 
