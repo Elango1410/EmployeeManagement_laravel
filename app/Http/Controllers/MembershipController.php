@@ -82,7 +82,6 @@ class MembershipController extends Controller
      */
     public function edit(Request $request)
     {
-        //
 
         $plan_edit=Memberships::where('plan_id',$request->plan_id)->update([
             'plan_name'=>$request->plan_name,
