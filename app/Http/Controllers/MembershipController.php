@@ -13,7 +13,7 @@ class MembershipController extends Controller
     public function index()
     {
         //
-        $member_list = Memberships::select('plan_id', 'plan_name', 'plan_duration', 'plan_amount')
+        $member_list = Memberships::select('plan_id', 'plan_name', 'plan_duration', 'plan_amount','benefits','expiry_date')
             ->selectRaw('date_format(created_at, "%d/%m/%Y") as date')
             ->get();
         $member_list_count = count($member_list);
@@ -61,7 +61,7 @@ class MembershipController extends Controller
      */
     public function show(Request $request)
     {
-        $plan_view = Memberships::select('plan_id', 'plan_name', 'plan_duration as plan_type', 'plan_amount', 'benefits')
+        $plan_view = Memberships::select('plan_id', 'plan_name', 'plan_duration as plan_type', 'plan_amount','benefits','expiry_date')
             ->where('plan_id', $request->plan_id)->get();
         if (count($plan_view) === 1) {
             return response()->json([
