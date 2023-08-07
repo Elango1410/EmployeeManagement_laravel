@@ -16,7 +16,7 @@ class UsertabController extends Controller
         $type = $request->type;
 
         if ($type == 0) {
-            //yet to be verified
+            //yet to be verify
             $verify_user = UsersTab::select('token', 'mobile_number', 'imr_number', 'status')
                 ->selectRaw('date_format(created_at, "%d/%m/%Y") as date')
                 ->where('status', '=', '0')->get();
