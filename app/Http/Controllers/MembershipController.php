@@ -60,12 +60,21 @@ class MembershipController extends Controller
     {
         $plan_view = Memberships::select('plan_id', 'plan_name', 'plan_duration as plan_type', 'plan_amount', 'benefits')
             ->where('plan_id', $request->plan_id)->get();
-        return response()->json([
-            'status_code' => 200,
-            'title' => 'success',
-            'message' => 'plan_view',
-            'data' => $plan_view
-        ]);
+        if (count($plan_view) === 1) {
+            return response()->json([
+                'status_code' => 200,
+                'title' => 'success',
+                'message' => 'plan_view',
+                'data' => $plan_view
+            ]);
+        } else {
+            return response()->json([
+                'status_code' => 400,
+                'title' => 'fails',
+                'message' => 'No record',
+                'data' => []
+            ]);
+        }
     }
 
     /**
