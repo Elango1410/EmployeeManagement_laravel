@@ -94,6 +94,13 @@ class MembershipController extends Controller
                 'message' => 'Updated Successfully',
                 'data' => []
             ]);
+        }else{
+            return response()->json([
+                'status_code' => 400,
+                'title' => 'Fails',
+                'message' => 'No Record',
+                'data' => []
+            ]);
         }
     }
 

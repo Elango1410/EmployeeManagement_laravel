@@ -14,10 +14,12 @@ return new class extends Migration
         //
         Schema::create('membership_plans',function(Blueprint $table){
             $table->id();
+            $table->string('plan_id');
             $table->string('plan_name');
             $table->string('plan_duration');
-            $table->integer('plan_amount');
+            $table->string('plan_amount');
             $table->text('benefits');
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
         });
     }
