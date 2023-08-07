@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('type',['free','normal']);
             $table->enum('device_type',['web','andriod','ios']);
             $table->string('device_toke',20);
-            $table->tinyInteger('status');
+            $table->enum('status',['0','1','2']);
         });
     }
 
