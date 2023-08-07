@@ -14,6 +14,7 @@ class Memberships extends Model
         'plan_name',
         'plan_duration',
         'plan_amount',
-        'benefits'
+        'benefits',
+        'expiry_date'
     ];
 }
