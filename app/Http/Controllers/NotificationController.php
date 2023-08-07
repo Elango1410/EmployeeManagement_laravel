@@ -27,33 +27,29 @@ class NotificationController extends Controller
      */
     public function create(Request $request)
     {
-        $notification=[];
-        // $type[] = $request->type;
-        foreach($request['type'] as $type){
-            $notification = Notifications::create([
+
+        $type = $request->type;
+// return $type;
+        $notification = Notifications::create([
+            'token' => rand(100000, 999999),
+            'type' => $type,
+            'title' => $request->title,
+            'description' => $request->description
+        ]);
+        $notificationToken = $notification->token;
+        // return $notificationToken;
+
+        $user_token = UsersTab::select('token')->where('type', $type)->get();
+        // return $user_token;
+
+        foreach ($user_token as $userToken) {
+            $user_notification = UsersNotification::create([
                 'token' => rand(100000, 999999),
-                'type' => $type,
-                'title' => $request->title,
-                'description' => $request->description
+                'user_token' => $userToken->token,
+                'notification_token' => $notificationToken,
+
             ]);
-        $notificationToken[] = $notification->token;
-
         }
-
-            return $notificationToken;
-
-
-        // $user_token = UsersTab::select('token')->where('type', $type)->get();
-        // // return $user_token;
-
-        // foreach ($user_token as $userToken) {
-        //     $user_notification = UsersNotification::create([
-        //         'token' => rand(100000, 999999),
-        //         'user_token' => $userToken->token,
-        //         'notification_token' => $notificationToken,
-
-        //     ]);
-        // }
 
         return response()->json([
             'status_code' => 200,
@@ -69,15 +65,27 @@ class NotificationController extends Controller
      */
     public function store(Request $request)
     {
+
         //
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
         //
+        $token= $request->token;
+        $notification_view=Notifications::select('token','type','title','description')
+        ->where('token',$token)->get();
+
+        return response()->json([
+            'status_code'=>200,
+            'title'=>'Success',
+            'message'=>'Notification view',
+            'data'=>$notification_view
+        ]);
     }
 
     /**

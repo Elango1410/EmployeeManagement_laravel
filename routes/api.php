@@ -44,11 +44,11 @@ Route::post('employee/delete',[EmployeeController::class,'destroy_employee']);
 Route::post('employee/filter',[EmployeeController::class,'filter_employee']);
 Route::post('employee/search/{name}',[EmployeeController::class,'search_employee']);
 
-
+Route::post('noti_view',[NotificationController::class,'show']);
+Route::post('create_noti',[NotificationController::class,'create']);
 Route::post('noti_list',[NotificationController::class,'index']);
 });
 
-Route::post('create_noti',[NotificationController::class,'create']);
 
 Route::post('forget-password', [UserController::class, 'forgetPassword']);
 Route::post('user/register',[UserController::class,'register_user']);
